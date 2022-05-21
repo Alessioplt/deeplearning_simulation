@@ -1,0 +1,36 @@
+presentation:
+grille de x*x pixel chaque pixel est une case que peu acceuillir un individu
+certaine zones safe laisse les individu ce reproduires
+
+0,0 haut gauche
+x, y
+neuronnes:
+chaque neuronne a une chance de s'activé 
+
+input neuronne avec la plus grande valeure s'active a la fin,
+
+neuronnes sensorielles
+EBD = est border distance	0000000
+SBD = south border distance	0000001
+DS = detect somebody south	0000010
+DN = detect somebody north	0000011
+DW = detect somebody west	0000100
+DE = detect somebody est	0000101
+RnI = random input		0000110
+
+internal neuron:
+do nothing?			0000111
+
+neuronne action:
+MS = Move south			0001000
+MN = Move north			0001001
+MW = Move west			0001010
+ME = Move est			0001011
+MR = moveRandom			0001100
+MSW = Move south west		0001101
+MSE = Move south est		0001110
+MNW = Move north west		0001111
+MNE = Move north est		0010000
+
+
+removed            "0000111": "INTERNAL",
