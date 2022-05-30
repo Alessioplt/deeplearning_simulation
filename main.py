@@ -1,3 +1,5 @@
+import time
+
 import pygame
 import sys
 import random
@@ -14,6 +16,7 @@ WINDOW_WIDTH = 700
 
 
 def main(listePopulation, checked):
+    simulationStarted= False
     pygame.init()
     continueRunning = False
     SCREEN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -33,13 +36,7 @@ def main(listePopulation, checked):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
                 #update all genomes
-                for value in listePopulation:
-                    if value == checked:
-                        SCREEN.fill(WHITE, (value.oldCoord[0] + 1, value.params[0][1] + 1, 8, 8))
-                        SCREEN.fill(GREEN, (value.oldCoord[0]+10 + 1, value.params[0][1] + 1, 8, 8))
-                        value.oldCoord = (value.oldCoord[0]+10, value.oldCoord[1])
-                    else:
-                        SCREEN.fill(RED, (value.params[0][0] + 1, value.params[0][1] + 1, 8, 8))
+                startSimutation(SCREEN, listePopulation, 60, 10)
 
         pygame.display.flip()
 
@@ -55,18 +52,36 @@ def drawGrid(screen):
 def createIndividus(number, numberGenome, taillegrille, coordonneesInterdites = []):
     listeCoord = []
     individusListe = []
+
     for _ in range(number):
         coord = (random.randint(0,taillegrille/10)*10, random.randint(0,taillegrille/10)*10)
         while coord in listeCoord:
             coord = (random.randint(0, taillegrille / 10) * 10, random.randint(0, taillegrille / 10) * 10)
         listeCoord.append(coord)
-        individusListe.append(Individu(numberGenome, [coord, WINDOW_HEIGHT, listeCoord]))
+        individusListe.append(Individu(numberGenome, [coord, WINDOW_HEIGHT]))
     return individusListe
 
-individuListe = createIndividus(1, 10, WINDOW_HEIGHT)
+def startSimutation(SCREEN, listePopulation, numberOfActionPerGen, actionPerSecond):
+    for i in range(numberOfActionPerGen):
+        allCoord = getAllCoord(listePopulation)
+        for value in listePopulation:
+            SCREEN.fill(WHITE, (value.params[0][0] + 1, value.params[0][1] + 1, 8, 8))
+            value.calculate(allCoord)
+            if value == listePopulation[0]:
+                SCREEN.fill(GREEN, (value.params[0][0] + 1, value.params[0][1] + 1, 8, 8))
+            else:
+                SCREEN.fill(RED, (value.params[0][0] + 1, value.params[0][1] + 1, 8, 8))
+        pygame.display.flip()
+        time.sleep(1/actionPerSecond)
+def getAllCoord(listePopulation):
+    returnValue = []
+    for value in listePopulation:
+        returnValue.append(value.params[0])
+    return returnValue
+individuListe = createIndividus(1000, 10, WINDOW_HEIGHT)
 
 graph = Graph(individuListe[0].genome)
-individuListe[0].calculate()
-print(individuListe[0].params[0])
 graph.drawGraph()
 main(individuListe, individuListe[0])
+
+#check les nouvelles position pour evité les collisions

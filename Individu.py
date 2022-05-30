@@ -102,7 +102,8 @@ class Individu:
     def move(self, newCoord):
         self.params[0] = newCoord
 
-    def calculate(self):
+    def calculate(self, allCoord):
+        params = [self.params[0], self.params[1], allCoord]
         # {"id": [[liste valeures], [cibles]]}
         self.oldCoord=self.params[0]
         allNeutral = {}
@@ -125,7 +126,7 @@ class Individu:
             #call sensor then do math
             #sensor
             if inputType=="0":
-                inputValue = Gene.callFunction(inputId, self.params)
+                inputValue = Gene.callFunction(inputId, params)
                 impulsion = inputValue*weight
                 if sinkType == "0":
                     if sinkId not in allAction.keys():
@@ -140,10 +141,13 @@ class Individu:
             #neutral
             elif inputType == "1":
                 if inputId not in allNeutral.keys():
-                    #neutralToActionConnection[sinkId] = []
                     allNeutral[inputId] = [[0], [sinkId]]
                 else:
-                    allNeutral[inputId][1].append(sinkId)²
+                    allNeutral[inputId][1].append(sinkId)
+                if sinkId not in neutralToActionConnection.keys():
+                    neutralToActionConnection[sinkId] = [[], []]
+                neutralToActionConnection[sinkId][0].append(inputId)
+                neutralToActionConnection[sinkId][1].append(weight)
                 if sinkType == "0":
                     if sinkId not in allAction.keys():
                         allAction[sinkId] = [0]
@@ -154,18 +158,38 @@ class Individu:
         for neutral in allNeutral.keys():
             sommeNeutral = numpy.tanh(sum(allNeutral[neutral][0]))
             for action in allNeutral[neutral][1]:
+                if action in neutralToActionConnection:
+                    if neutral in neutralToActionConnection[action][0]:
+                        #get weight of neutral lol
+                        impulsion = neutralToActionConnection[action][1][neutralToActionConnection[action][0].index(neutral)] * sommeNeutral
+
+                else :
+                    impulsion = sommeNeutral
                 if action not in allAction:
-                    allAction[action] = [sommeNeutral]
+                    allAction[action] = [impulsion]
                 else:
-                    allAction[action].append(sommeNeutral)
-
+                    allAction[action].append(impulsion)
+        actionChoice = {}
         for action in allAction.keys():
-            sommeAction = numpy.tanh(sum(allAction[action]))
+            if action not in allNeutral:
+                sommeAction = numpy.tanh(sum(allAction[action]))
+                actionChoice[action] = sommeAction
 
-        print(allNeutral)
-        print(allAction)
+        listOfKeys = [key for (key, value) in actionChoice.items() if value == max(actionChoice.values())]
+        actionNeuronActivated = random.choice(listOfKeys)
 
-    #TODO: agissement de l'individu par rapoort a ces genes
+
+        final = Gene.callFunction(actionNeuronActivated, params)
+        if final == None:
+            return "None"
+        if final[0]>self.params[1]+10 or final[0]<0:
+            return "can't move"
+        if final[1]>self.params[1]+10 or final[1]<0:
+            return "can't move"
+        self.params[0] = final
+
+
+    #DONE: agissement de l'individu par rapoort a ces genes
 
 
 #11110000111110100011101110011001
