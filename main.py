@@ -62,11 +62,13 @@ def createIndividus(number, numberGenome, taillegrille, coordonneesInterdites = 
     return individusListe
 
 def startSimutation(SCREEN, listePopulation, numberOfActionPerGen, actionPerSecond):
+
     for i in range(numberOfActionPerGen):
         allCoord = getAllCoord(listePopulation)
         for value in listePopulation:
             SCREEN.fill(WHITE, (value.params[0][0] + 1, value.params[0][1] + 1, 8, 8))
-            value.calculate(allCoord)
+            value.calculate(allCoord.values())
+            allCoord[value.genome] = value.params[0]
             if value == listePopulation[0]:
                 SCREEN.fill(GREEN, (value.params[0][0] + 1, value.params[0][1] + 1, 8, 8))
             else:
@@ -74,9 +76,9 @@ def startSimutation(SCREEN, listePopulation, numberOfActionPerGen, actionPerSeco
         pygame.display.flip()
         time.sleep(1/actionPerSecond)
 def getAllCoord(listePopulation):
-    returnValue = []
+    returnValue = {}
     for value in listePopulation:
-        returnValue.append(value.params[0])
+        returnValue[value.genome] = value.params[0]
     return returnValue
 individuListe = createIndividus(1000, 10, WINDOW_HEIGHT)
 

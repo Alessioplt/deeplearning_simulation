@@ -186,7 +186,8 @@ class Individu:
             return "can't move"
         if final[1]>self.params[1]+10 or final[1]<0:
             return "can't move"
-        self.params[0] = final
+        if final not in allCoord:
+            self.params[0] = final
 
 
     #DONE: agissement de l'individu par rapoort a ces genes
