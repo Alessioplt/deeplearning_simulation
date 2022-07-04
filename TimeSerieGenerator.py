@@ -35,3 +35,4 @@ class TimeSeriegenerator:
         run = f"/Run_{biggest}"
         Path(f"./logs/{today}/{run}").mkdir(parents=False, exist_ok=True)
         plt.savefig(f"./logs/{today}/{run}/_NuageDePoints.png", dpi=600)
+        plt.close()
