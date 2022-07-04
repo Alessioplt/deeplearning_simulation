@@ -4,7 +4,7 @@ import os
 import matplotlib.pyplot as plt
 import networkx as nx
 from pathlib import Path
-from datetime import date, datetime
+from datetime import date
 
 import json
 class Graph:
@@ -92,4 +92,4 @@ class Graph:
         run = f"/Run_{biggest}"
         Path(f"./logs/{today}/{run}").mkdir(parents=False, exist_ok=True)
         plt.savefig(f"./logs/{today}/{run}/Generation_{self.generation}.png", dpi=600)
-
+        plt.close()

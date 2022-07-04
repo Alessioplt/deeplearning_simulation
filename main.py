@@ -6,7 +6,7 @@ import random
 
 from Graph import Graph
 from Individu import Individu
-
+from TimeSerieGenerator import TimeSeriegenerator
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
@@ -16,7 +16,7 @@ WINDOW_HEIGHT = 700
 WINDOW_WIDTH = 700
 generation = 1
 
-def main(listePopulation, coordSafe, generation):
+def main(listePopulation, coordSafe, generation, statsNuage):
     pygame.init()
     SCREEN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     updateScreen(SCREEN, coordSafe, listePopulation)
@@ -29,14 +29,14 @@ def main(listePopulation, coordSafe, generation):
         startSimutation(SCREEN, listePopulation, 150, 999999, coordSafe)
         #time.sleep(2)
         cleanBoard(SCREEN, listePopulation, coordSafe)
-        print(f"Survived at gen {generation} = {len(listePopulation)}")
+        survivants = len(listePopulation)
+        print(f"Survived at gen {generation} = {survivants}")
         # regenerateNewPopulation (ceux qui restent ce reproduisent)
-        listePopulation = createNewGen(listePopulation, 1000, 10, WINDOW_HEIGHT)
+        listePopulation = createNewGen(listePopulation, tailleSimulation, 10, WINDOW_HEIGHT)
         updateScreen(SCREEN, coordSafe, listePopulation)
         generation += 1
-        graph = Graph(individuListe[0].genome, generation)
-        graph.drawGraph()
-
+        Graph(listePopulation[0].genome, generation).drawGraph()
+        statsNuage.addValue(generation-1, survivants)
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
                 pygame.quit()
@@ -88,7 +88,7 @@ def createNewGen(listePopulation, number, numberGenome, taillegrille):
         while coord in listeCoord:
             coord = (random.randint(0, taillegrille / 10) * 10, random.randint(0, taillegrille / 10) * 10)
         listeCoord.append(coord)
-        individusListe.append(Individu(numberGenome, [coord, taillegrille], listePopulation[increment].genome, 100))
+        individusListe.append(Individu(numberGenome, [coord, taillegrille], listePopulation[increment].genome, 5))
         if increment==len(listePopulation)-1:
             increment=0
         else:
@@ -131,12 +131,14 @@ def cleanBoard(SCREEN, listePopulation, coordSafe):
         listePopulation.remove(value)
     pygame.display.flip()
 
-individuListe = createIndividus(1000, 10, WINDOW_HEIGHT)
+tailleSimulation = 1000
+individuListe = createIndividus(tailleSimulation, 10, WINDOW_HEIGHT)
 
 graph = Graph(individuListe[0].genome, generation)
 graph.drawGraph()
+statsNuage = TimeSeriegenerator(tailleSimulation)
 #taille de la grille en carré
 grid = (0, 0, 10, 100)
-main(individuListe, (grid[0], grid[1], grid[0]+grid[2]*10, grid[1]+grid[3]*10), generation)
+main(individuListe, (grid[0], grid[1], grid[0]+grid[2]*10, grid[1]+grid[3]*10), generation, statsNuage)
 
 #check les nouvelles position pour evité les collisions

@@ -109,13 +109,16 @@ class Individu:
                 temp = self.randomSinkId()
                 sinkType = temp[2]
                 sinkId = temp[0]
+            if random.randint(0, 100) < mutateChance:
+                weight = str(bin(random.randint(0, 32767))).replace('0b', "").zfill(15)
+            if random.randint(0, 100) < mutateChance:
+                weightNegative = str(random.randint(0, 1))
             gene = inputType + inputId + sinkType + sinkId + weightNegative + weight
             gene = hex(int(gene, 2))[2:].zfill(8)
             if newGenome != "":
                 newGenome += " "
             newGenome += gene
         self.genome = newGenome
-        print("old:\n"+dadGenome + "\nnew:\n" + newGenome+ "\n\n")
 
     def cleanUselessConnection(self, allNeutral):
         #si 2 fini dans 0 supprime 2
@@ -216,6 +219,8 @@ class Individu:
                 actionChoice[action] = sommeAction
 
         listOfKeys = [key for (key, value) in actionChoice.items() if value == max(actionChoice.values())]
+        if len(listOfKeys) == 0:
+            return None
         actionNeuronActivated = random.choice(listOfKeys)
 
 
