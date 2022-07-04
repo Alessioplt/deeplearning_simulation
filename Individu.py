@@ -4,51 +4,66 @@ import Gene
 
 
 class Individu:
-    def __init__(self, connectionNumber, gridInfo, dadGenome = ""):
+    def __init__(self, connectionNumber, gridInfo, dadGenome = "", mutateChance= 0):
         self.connectionNumber= connectionNumber
 
         self.dadGenome = dadGenome
         self.genome = ""
+        self.mutateChance = mutateChance
         self.params = gridInfo
         self.oldCoord = ()
         self.neutralDico = {}
         self.actionDico = {}
         if dadGenome != "":
             pass
-            #create genome base on dad one
+            self.createSonGene(self.dadGenome, self.mutateChance)
         else:
             #print("_-------_-------________________")
             self.createRandomGene(connectionNumber)
             #create random genome
 
+    def randomSourceId(self):
+        allSensor = Gene.getTypeGene("S")
+        sourceType = str(random.randint(1, 6))
+        if int(sourceType) > 1:
+            sourceType = "0"
+        if sourceType == "0":
+            sourceId = allSensor[random.randint(0, len(allSensor) - 1)]
+            neutralSource = ""
+        else:
+            neutralSource = str(bin(random.randint(100, 127)))[2:].zfill(7)
+            sourceId = neutralSource
+        return sourceId, neutralSource, sourceType
+
+    def randomSinkId(self):
+        allAction = Gene.getTypeGene("A")
+        sinkType = str(random.randint(1, 6))
+        if int(sinkType) > 1:
+            sinkType = "0"
+        if sinkType == "0":
+            sinkId = allAction[random.randint(0, len(allAction) - 1)]
+            neutral = ""
+        else:
+            neutral = str(bin(random.randint(100, 127)))[2:].zfill(7)
+
+            sinkId = neutral
+        return sinkId, neutral, sinkType
     #select random form sensor or internal then do connection to internal or action
     def createRandomGene(self, number):
         middleNodeUsed = []
         middleNodeConnected = False
         allNeutral = {}
         for _ in range(number):
-            allSensor = Gene.getTypeGene("S")
-            allAction = Gene.getTypeGene("A")
 
-            sourceType = str(random.randint(1, 6))
-            if int(sourceType) > 1:
-                sourceType  = "0"
-            if sourceType == "0":
-                sourceId = allSensor[random.randint(0, len(allSensor) - 1)]
-            else:
-                neutralSource = str(bin(random.randint(100,127)))[2:].zfill(7)
-                sourceId = neutralSource
+            temp = self.randomSourceId()
+            sourceId = temp[0]
+            neutralSource = temp[1]
+            sourceType = temp[2]
 
-            sinkType = str(random.randint(1, 6))
-            if int(sinkType) > 1:
-                sinkType  = "0"
-            if sinkType == "0":
-                sinkId = allAction[random.randint(0, len(allAction) - 1)]
-            else:
-                neutral = str(bin(random.randint(100, 127)))[2:].zfill(7)
-
-                sinkId = neutral
-
+            temp = self.randomSinkId()
+            sinkId = temp[0]
+            neutralSink = temp[1]
+            sinkType = temp[2]
             weight = str(bin(random.randint(0, 32767))).replace('0b', "").zfill(15)
 
             # 1 = negative
@@ -62,20 +77,45 @@ class Individu:
                     allNeutral[neutralSource] = [1, gene]
             elif sourceType == "1" and sinkType == "1":
                 if neutralSource in allNeutral.keys():
-                    allNeutral[neutralSource] = [2, allNeutral[neutralSource][1] + " " + gene, neutral]
+                    allNeutral[neutralSource] = [2, allNeutral[neutralSource][1] + " " + gene, neutralSink]
                 else:
-                    allNeutral[neutralSource] = [2, gene, neutral]
+                    allNeutral[neutralSource] = [2, gene, neutralSink]
             if sinkType=="1":
-                if neutral not in allNeutral.keys():
-                    allNeutral[neutral] = [0, gene]
+                if neutralSink not in allNeutral.keys():
+                    allNeutral[neutralSink] = [0, gene]
                 else:
-                    allNeutral[neutral] = [0, allNeutral[neutral][1] + " " + gene]
+                    allNeutral[neutralSink] = [0, allNeutral[neutralSink][1] + " " + gene]
             if self.genome != "":
                 self.genome += " "
             self.genome += gene
         self.cleanUselessConnection(allNeutral)
 
-
+    def createSonGene(self, dadGenome, mutateChance):
+        newGenome = ""
+        for value in dadGenome.split(" "):
+            genome = bin(int(value, 16))[2:].zfill(32)
+            inputType=genome[0]
+            inputId=genome[1:8]
+            sinkType=genome[8]
+            sinkId=genome[9:16]
+            weightNegative = genome[16]
+            weight=genome[17:]
+            #new random sensor
+            if random.randint(0, 100) < mutateChance:
+                temp = self.randomSourceId()
+                inputType = temp[2]
+                inputId = temp[0]
+            if random.randint(0, 100) < mutateChance:
+                temp = self.randomSinkId()
+                sinkType = temp[2]
+                sinkId = temp[0]
+            gene = inputType + inputId + sinkType + sinkId + weightNegative + weight
+            gene = hex(int(gene, 2))[2:].zfill(8)
+            if newGenome != "":
+                newGenome += " "
+            newGenome += gene
+        self.genome = newGenome
+        print("old:\n"+dadGenome + "\nnew:\n" + newGenome+ "\n\n")
 
     def cleanUselessConnection(self, allNeutral):
         #si 2 fini dans 0 supprime 2

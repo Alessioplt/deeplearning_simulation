@@ -1,3 +1,6 @@
+import glob
+import os
+
 import matplotlib.pyplot as plt
 import networkx as nx
 from pathlib import Path
@@ -5,8 +8,9 @@ from datetime import date, datetime
 
 import json
 class Graph:
-    def __init__(self, genome):
+    def __init__(self, genome, generation):
         self.genome = genome
+        self.generation = generation
         self.genesList =json.load(open('genes.json'))
         self.pos = {}
         self.listeSensor = []
@@ -75,8 +79,17 @@ class Graph:
         ax.margins(0.08)
         plt.axis("off")
         plt.tight_layout()
-        today = date.today().strftime("%d-%m-%Y")
-        now = datetime.now().strftime("%H-%M-%S")
+        today = date.today().strftime("%Y-%m-%d")
         Path(f"./logs/{today}").mkdir(parents=False, exist_ok=True)
-        plt.savefig(f"./logs/{today}/{now}.png", dpi=600)
+        biggest = 0
+        for dir in glob.glob(f'./logs/{today}/*'):
+            if os.path.isdir(dir):
+                value = int(dir.split("Run_")[1])
+                if value>biggest:
+                    biggest = value
+        if self.generation == 1:
+            biggest +=1
+        run = f"/Run_{biggest}"
+        Path(f"./logs/{today}/{run}").mkdir(parents=False, exist_ok=True)
+        plt.savefig(f"./logs/{today}/{run}/Generation_{self.generation}.png", dpi=600)
 
