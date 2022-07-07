@@ -12,8 +12,8 @@ WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 PINK = (255, 153, 204)
-WINDOW_HEIGHT = 700
-WINDOW_WIDTH = 700
+WINDOW_HEIGHT = 1000
+WINDOW_WIDTH = 1000
 generation = 1
 
 def main(listePopulation, coordSafe, generation, statsNuage):
@@ -54,7 +54,7 @@ def drawGrid(screen):
 
 def updateScreen(SCREEN, coordSafe, listePopulation):
     SCREEN.fill(WHITE)
-    SCREEN.fill(PINK, coordSafe)
+    SCREEN.fill(PINK, (coordSafe[0], coordSafe[1], coordSafe[2]-coordSafe[0], coordSafe[3]-coordSafe[1]))
     drawGrid(SCREEN)
 
     for value in listePopulation:
@@ -138,7 +138,7 @@ graph = Graph(individuListe[0].genome, generation)
 graph.drawGraph()
 statsNuage = TimeSeriegenerator(tailleSimulation)
 #taille de la grille en carré
-grid = (0, 0, 10, 100)
-main(individuListe, (grid[0], grid[1], grid[0]+grid[2]*10, grid[1]+grid[3]*10), generation, statsNuage)
+grid = (200, 200, 33, 33)
+main(individuListe, (grid[0], grid[1], grid[0]+(grid[2]*10), grid[1]+(grid[3]*10)), generation, statsNuage)
 
 #check les nouvelles position pour evité les collisions

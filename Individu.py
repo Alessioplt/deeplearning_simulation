@@ -227,9 +227,9 @@ class Individu:
         final = Gene.callFunction(actionNeuronActivated, params)
         if final == None:
             return "None"
-        if final[0]>self.params[1]+10 or final[0]<0:
+        if final[0]>self.params[1] or final[0]<0:
             return "can't move"
-        if final[1]>self.params[1]+10 or final[1]<0:
+        if final[1]>self.params[1] or final[1]<0:
             return "can't move"
         if final not in allCoord:
             self.params[0] = final
