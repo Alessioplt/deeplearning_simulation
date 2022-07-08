@@ -15,7 +15,7 @@ PINK = (255, 153, 204)
 WINDOW_HEIGHT = 1000
 WINDOW_WIDTH = 1000
 generation = 1
-
+numberConnection = 100
 def main(listePopulation, coordSafe, generation, statsNuage):
     pygame.init()
     SCREEN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -32,7 +32,7 @@ def main(listePopulation, coordSafe, generation, statsNuage):
         survivants = len(listePopulation)
         print(f"Survived at gen {generation} = {survivants}")
         # regenerateNewPopulation (ceux qui restent ce reproduisent)
-        listePopulation = createNewGen(listePopulation, tailleSimulation, 10, WINDOW_HEIGHT)
+        listePopulation = createNewGen(listePopulation, tailleSimulation, numberConnection, WINDOW_HEIGHT)
         updateScreen(SCREEN, coordSafe, listePopulation)
         generation += 1
         Graph(listePopulation[0].genome, generation).drawGraph()
@@ -132,12 +132,13 @@ def cleanBoard(SCREEN, listePopulation, coordSafe):
     pygame.display.flip()
 
 tailleSimulation = 1000
-individuListe = createIndividus(tailleSimulation, 10, WINDOW_HEIGHT)
+individuListe = createIndividus(tailleSimulation, numberConnection, WINDOW_HEIGHT)
 
 graph = Graph(individuListe[0].genome, generation)
 graph.drawGraph()
 statsNuage = TimeSeriegenerator(tailleSimulation)
 #taille de la grille en carré
+
 grid = (200, 200, 33, 33)
 main(individuListe, (grid[0], grid[1], grid[0]+(grid[2]*10), grid[1]+(grid[3]*10)), generation, statsNuage)
 
