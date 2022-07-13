@@ -8,7 +8,8 @@ from datetime import date
 
 import json
 class Graph:
-    def __init__(self, genome, generation):
+    def __init__(self, genome, generation, score):
+        self.score = score
         self.genome = genome
         self.generation = generation
         self.genesList =json.load(open('genes.json'))
@@ -49,7 +50,6 @@ class Graph:
                 G.add_edge(self.genesList[inputId], sinkId, weight=weight)
             else:
                 G.add_edge(self.genesList[inputId], self.genesList[sinkId], weight=weight)
-            #
         middle = (max([len(self.listeSensor), len(self.listeNeutral), len(self.listeAction)])-1)/2
         for i in range (len(self.listeSensor)):
             self.pos[self.genesList[self.listeSensor[i]]] = (i,1)
@@ -78,6 +78,7 @@ class Graph:
         ax = plt.gca()
         ax.margins(0.08)
         plt.axis("off")
+        plt.title("score: " + str(self.score))
         plt.tight_layout()
         today = date.today().strftime("%Y-%m-%d")
         Path(f"./logs/{today}").mkdir(parents=False, exist_ok=True)

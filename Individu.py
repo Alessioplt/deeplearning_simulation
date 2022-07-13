@@ -4,9 +4,9 @@ import Gene
 
 
 class Individu:
-    def __init__(self, connectionNumber, gridInfo, dadGenome = "", mutateChance= 0):
+    def __init__(self, connectionNumber, gridInfo, dadGenome = "", mutateChance= 0, score= 0):
         self.connectionNumber= connectionNumber
-
+        self.score = score
         self.dadGenome = dadGenome
         self.genome = ""
         self.mutateChance = mutateChance
@@ -14,13 +14,15 @@ class Individu:
         self.oldCoord = ()
         self.neutralDico = {}
         self.actionDico = {}
-        if dadGenome != "":
-            pass
-            self.createSonGene(self.dadGenome, self.mutateChance)
+        if mutateChance == 0 and dadGenome != "":
+            self.genome = dadGenome
         else:
-            #print("_-------_-------________________")
-            self.createRandomGene(connectionNumber)
-            #create random genome
+            if dadGenome != "":
+                self.createSonGene(self.dadGenome, self.mutateChance)
+            else:
+                #print("_-------_-------________________")
+                self.createRandomGene(connectionNumber)
+                #create random genome
 
     def randomSourceId(self):
         allSensor = Gene.getTypeGene("S")
@@ -130,8 +132,8 @@ class Individu:
                     else:
 
                         self.genome = self.genome.replace(" " + genome, "")
-
-            if allNeutral[value][0] == 2:
+            #TODO: check if we can remove that
+            """if allNeutral[value][0] == 2:
                 if allNeutral[value][2] in allNeutral.keys():
                     if allNeutral[allNeutral[value][2]][0] == 0:
                         genome = allNeutral[value][1].split(" ")
@@ -139,7 +141,7 @@ class Individu:
                             if i != len(genome) - 1:
                                 self.genome = self.genome.replace(genome[i] + " ", "")
                             else:
-                                self.genome = self.genome.replace(" " + genome[i], "")
+                                self.genome = self.genome.replace(" " + genome[i], "")"""
 
 
     def move(self, newCoord):
@@ -232,7 +234,7 @@ class Individu:
         if final[1]>self.params[1] or final[1]<0:
             return "can't move"
         if final not in allCoord:
-            self.params[0] = final
+            self.move(final)
 
 
     #DONE: agissement de l'individu par rapoort a ces genes
