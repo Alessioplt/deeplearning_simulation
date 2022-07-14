@@ -18,10 +18,12 @@ WINDOW_HEIGHT = 1000
 WINDOW_WIDTH = 1000
 generation = 1
 numberConnection = 20
-def main(listePopulation, coordSafe, generation, statsNuage):
+
+#TODO being able to continue a simultation
+def main(listePopulation, allSafe, generation, statsNuage):
     pygame.init()
     SCREEN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-    updateScreen(SCREEN, coordSafe, listePopulation)
+    updateScreen(SCREEN, allSafe, listePopulation)
     while True:
         event = pygame.event.wait()
         if event.type == pygame.QUIT:
@@ -29,14 +31,15 @@ def main(listePopulation, coordSafe, generation, statsNuage):
             sys.exit()
         #time.sleep(3)
         #150 action
-        startSimutation(SCREEN, listePopulation, 150, coordSafe)
-        #time.sleep(2)
-        cleanBoard(SCREEN, listePopulation, coordSafe)
+        startSimutation(SCREEN, listePopulation, 150, allSafe)
+
+        cleanBoard(SCREEN, listePopulation, allSafe)
+        #time.sleep(5)
         survivants = len(listePopulation)
         print(f"Survived at gen {generation} = {survivants}")
         # regenerateNewPopulation (ceux qui restent ce reproduisent)
         listePopulation = createNewGen(listePopulation, tailleSimulation, numberConnection, WINDOW_HEIGHT, generation)
-        updateScreen(SCREEN, coordSafe, listePopulation)
+        updateScreen(SCREEN, allSafe, listePopulation)
         generation += 1
         statsNuage.addValue(generation-1, survivants)
         if event.type == pygame.KEYDOWN:
@@ -54,13 +57,14 @@ def drawGrid(screen):
             pygame.draw.rect(screen, (50, 50, 50), rect, 1)
 
 
-def updateScreen(SCREEN, coordSafe, listePopulation):
+def updateScreen(SCREEN, allSafe, listePopulation):
     SCREEN.fill(WHITE)
-    SCREEN.fill(PINK, (coordSafe[0], coordSafe[1], coordSafe[2]-coordSafe[0], coordSafe[3]-coordSafe[1]))
-    coordX = ((coordSafe[2]-coordSafe[0])/2)+coordSafe[0]
-    coordY = ((coordSafe[3]-coordSafe[1])/2)+coordSafe[1]
-    SCREEN.fill(YELLOW, (coordX, coordY, 10, 10))
-    drawGrid(SCREEN)
+    for coordSafe in allSafe:
+        SCREEN.fill(PINK, (coordSafe[0], coordSafe[1], coordSafe[2]-coordSafe[0], coordSafe[3]-coordSafe[1]))
+        coordX = ((coordSafe[2]-coordSafe[0])/2)+coordSafe[0]
+        coordY = ((coordSafe[3]-coordSafe[1])/2)+coordSafe[1]
+        SCREEN.fill(YELLOW, (coordX, coordY, 10, 10))
+        drawGrid(SCREEN)
 
     for value in listePopulation:
         if value == listePopulation[0]:
@@ -90,7 +94,17 @@ def createNewGen(listePopulation, number, numberGenome, taillegrille, generation
     numberReproductionLeft = listePopulation[increment].score // 10
     for value in listePopulation:
         listeCoord.append(value.params[0])
-
+    for value in listePopulation:
+        coord = (random.randint(0, taillegrille / 10) * 10, random.randint(0, taillegrille / 10) * 10)
+        while coord in listeCoord:
+            coord = (random.randint(0, taillegrille / 10) * 10, random.randint(0, taillegrille / 10) * 10)
+        listeCoord.append(coord)
+        if generation > 100:
+            individusListe.append(
+                Individu(numberGenome, [coord, taillegrille], value.genome, mutateChance=0))
+        else:
+            individusListe.append(
+                Individu(numberGenome, [coord, taillegrille], value.genome, mutateChance=2))
     while len(individusListe) < number:
         coord = (random.randint(0, taillegrille / 10) * 10, random.randint(0, taillegrille / 10) * 10)
         while coord in listeCoord:
@@ -116,16 +130,20 @@ def getAllCoord(listePopulation):
     return returnValue
 
 
-def startSimutation(SCREEN, listePopulation, numberOfActionPerGen, coordSafe):
+def startSimutation(SCREEN, listePopulation, numberOfActionPerGen, allSafe):
     for i in range(numberOfActionPerGen):
         allCoord = getAllCoord(listePopulation)
         for value in listePopulation:
-            if ((value.params[0][0] >= coordSafe[0] and value.params[0][0] < coordSafe[2]) and (
-                    value.params[0][1] >= coordSafe[1] and value.params[0][1] < coordSafe[3])):
+            isSafe = False
+            for coordSafe in allSafe:
+                if ((value.params[0][0] >= coordSafe[0] and value.params[0][0] < coordSafe[2]) and (
+                     value.params[0][1] >= coordSafe[1] and value.params[0][1] < coordSafe[3])):
+                    isSafe = True
+            if isSafe:
                 SCREEN.fill(PINK, (value.params[0][0] + 1, value.params[0][1] + 1, 8, 8))
-
             else:
                 SCREEN.fill(WHITE, (value.params[0][0] + 1, value.params[0][1] + 1, 8, 8))
+
             value.calculate(allCoord.values())
             allCoord[value] = value.params[0]
             if value == listePopulation[0]:
@@ -134,31 +152,42 @@ def startSimutation(SCREEN, listePopulation, numberOfActionPerGen, coordSafe):
                 SCREEN.fill(RED, (value.params[0][0] + 1, value.params[0][1] + 1, 8, 8))
         pygame.display.flip()
 
-def cleanBoard(SCREEN, listePopulation, coordSafe):
+def cleanBoard(SCREEN, listePopulation, allSafe):
     toRemove = []
-    middleX = ((coordSafe[2]-coordSafe[0])/2)+coordSafe[0]
-    middleY = ((coordSafe[3]-coordSafe[1])/2)+coordSafe[1]
-    middleSafe = [middleX, middleY]
-    distanceMiddleBorder = math.dist(middleSafe, [coordSafe[0], coordSafe[1]])
     for value in listePopulation:
-        if not(value.params[0][0] >= coordSafe[0] and value.params[0][0] < coordSafe[2]) or not(value.params[0][1] >= coordSafe[1] and value.params[0][1] < coordSafe[3]):
+        isSafe = False
+        for coordSafe in allSafe:
+            if not(value.params[0][0] >= coordSafe[0] and value.params[0][0] < coordSafe[2]) or not(value.params[0][1] >= coordSafe[1] and value.params[0][1] < coordSafe[3]):
+                pass
+            else:
+                isSafe = True
+                middleX = ((coordSafe[2] - coordSafe[0]) / 2) + coordSafe[0]
+                middleY = ((coordSafe[3] - coordSafe[1]) / 2) + coordSafe[1]
+                middleSafe = [middleX, middleY]
+                distanceMiddleBorder = math.dist(middleSafe, [coordSafe[0], coordSafe[1]])
+                dist = math.dist(middleSafe, value.params[0])
+                if int(100 - (dist*100/distanceMiddleBorder)) > value.score:
+                    value.score = int(100 - (dist*100/distanceMiddleBorder))
+        if not isSafe:
             SCREEN.fill(WHITE, (value.params[0][0] + 1, value.params[0][1] + 1, 8, 8))
             toRemove.append(value)
-        else:
-            dist = math.dist(middleSafe, value.params[0])
-            value.score = int(100 - (dist*100/distanceMiddleBorder)) + 4
+
     for value in toRemove:
         listePopulation.remove(value)
     pygame.display.flip()
 
-
+def newGrid(grid, allSafe):
+    allSafe.append((grid[0], grid[1], grid[0]+(grid[2]*10), grid[1]+(grid[3]*10)))
+    return allSafe
 tailleSimulation = 1000
 individuListe = createIndividus(tailleSimulation, numberConnection, WINDOW_HEIGHT)
 
+
 statsNuage = TimeSeriegenerator(tailleSimulation)
 #taille de la grille en carré
-
-grid = (200, 200, 33, 33)
-main(individuListe, (grid[0], grid[1], grid[0]+(grid[2]*10), grid[1]+(grid[3]*10)), generation, statsNuage)
+allSafe = []
+newGrid((0, 0, 7, 100), allSafe)
+newGrid((930, 0, 7, 100), allSafe)
+main(individuListe, allSafe, generation, statsNuage)
 
 #check les nouvelles position pour evité les collisions
