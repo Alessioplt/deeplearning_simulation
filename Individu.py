@@ -2,7 +2,7 @@ import random
 import numpy
 import Gene
 
-
+#TODO try to create a connection to action when a neutral is firstly created
 class Individu:
     def __init__(self, connectionNumber, gridInfo, dadGenome = "", mutateChance= 0, score= 0):
         self.connectionNumber= connectionNumber
@@ -132,16 +132,6 @@ class Individu:
                     else:
 
                         self.genome = self.genome.replace(" " + genome, "")
-            #TODO: check if we can remove that
-            """if allNeutral[value][0] == 2:
-                if allNeutral[value][2] in allNeutral.keys():
-                    if allNeutral[allNeutral[value][2]][0] == 0:
-                        genome = allNeutral[value][1].split(" ")
-                        for i in range(len(genome)):
-                            if i != len(genome) - 1:
-                                self.genome = self.genome.replace(genome[i] + " ", "")
-                            else:
-                                self.genome = self.genome.replace(" " + genome[i], "")"""
 
 
     def move(self, newCoord):

@@ -81,63 +81,63 @@ def RNI(params):
 #Move south
 def MS(params):
     newCoord = (params[0][0], params[0][1] + 10)
-    if newCoord[0] < params[1] - 10 and newCoord[1] < params[1] - 10 and newCoord not in params[2]:
+    if newCoord[0] < params[1] - 1 and newCoord[1] < params[1] - 1 and newCoord not in params[2]:
         return newCoord
 
 
 #Move north
 def MN(params):
     newCoord = (params[0][0], params[0][1] - 10)
-    if newCoord[0] < params[1] - 10 and newCoord[1] < params[1] - 10 and newCoord not in params[2]:
+    if newCoord[0] < params[1] - 1 and newCoord[1] < params[1] - 1 and newCoord not in params[2]:
         return newCoord
 
 
 #Move west
 def MW(params):
     newCoord = (params[0][0] - 10, params[0][1])
-    if newCoord[0] < params[1] - 10 and newCoord[1] < params[1] - 10 and newCoord not in params[2]:
+    if newCoord[0] < params[1] - 1 and newCoord[1] < params[1] - 1 and newCoord not in params[2]:
         return newCoord
 
 
 #Move est
 def ME(params):
     newCoord = (params[0][0] + 10, params[0][1])
-    if newCoord[0] < params[1] - 10 and newCoord[1] < params[1] - 10 and newCoord not in params[2]:
+    if newCoord[0] < params[1] - 1 and newCoord[1] < params[1] - 1 and newCoord not in params[2]:
         return newCoord
 
 
 #moveRandom
 def MR(params):
     newCoord = (params[0][0] + random.randint(-1,1)*10, params[0][1] + random.randint(-1,1)*10)
-    if newCoord[0] < params[1] - 10 and newCoord[1] < params[1] - 10 and newCoord not in params[2]:
+    if newCoord[0] < params[1] - 1 and newCoord[1] < params[1] - 1 and newCoord not in params[2]:
         return newCoord
 
 
 #Move south west
 def MSW(params):
     newCoord = (params[0][0] - 10, params[0][1] + 10)
-    if newCoord[0] < params[1] - 10 and newCoord[1] < params[1] - 10 and newCoord not in params[2]:
+    if newCoord[0] < params[1] - 1 and newCoord[1] < params[1] - 1 and newCoord not in params[2]:
         return newCoord
 
 
 #Move south est
 def MSE(params):
     newCoord = (params[0][0] + 10, params[0][1] + 10)
-    if newCoord[0] < params[1] - 10 and newCoord[1] < params[1] - 10 and newCoord not in params[2]:
+    if newCoord[0] < params[1] - 1 and newCoord[1] < params[1] - 1 and newCoord not in params[2]:
         return newCoord
 
 
 #Move north west
 def MNW(params):
     newCoord = (params[0][0] - 10, params[0][1] - 10)
-    if newCoord[0] < params[1] - 10 and newCoord[1] < params[1] - 10 and newCoord not in params[2]:
+    if newCoord[0] < params[1] - 1 and newCoord[1] < params[1] - 1 and newCoord not in params[2]:
         return newCoord
 
 
 #Move north est
 def MNE(params):
     newCoord = (params[0][0] + 10, params[0][1] - 10)
-    if newCoord[0] < params[1] - 10 and newCoord[1] < params[1] - 10 and newCoord not in params[2]:
+    if newCoord[0] < params[1] - 1 and newCoord[1] < params[1] - 1 and newCoord not in params[2]:
         return newCoord
 
 
