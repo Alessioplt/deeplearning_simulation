@@ -10,7 +10,6 @@ class TimeSeriegenerator:
         self.x = []
         self.y = []
         self.taille = taille
-
         self.update()
 
     def addValue(self, x, y):
@@ -33,6 +32,8 @@ class TimeSeriegenerator:
                 value = int(dir.split("Run_")[1])
                 if value > biggest:
                     biggest = value
+        if not self.x:
+            biggest +=1
         run = f"/Run_{biggest}"
         Path(f"./logs/{today}/{run}").mkdir(parents=False, exist_ok=True)
         plt.savefig(f"./logs/{today}/{run}/_NuageDePoints.png", dpi=600)

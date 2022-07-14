@@ -88,8 +88,7 @@ class Graph:
                 value = int(dir.split("Run_")[1])
                 if value>biggest:
                     biggest = value
-        if self.generation == 1:
-            biggest +=1
+
         run = f"/Run_{biggest}"
         Path(f"./logs/{today}/{run}").mkdir(parents=False, exist_ok=True)
         plt.savefig(f"./logs/{today}/{run}/Generation_{self.generation}.png", dpi=600)
