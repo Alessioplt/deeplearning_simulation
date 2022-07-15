@@ -18,7 +18,7 @@ class Graph:
         self.listeNeutral = []
         self.listeAction = []
 
-    def drawGraph(self):
+    def drawGraph(self, today=None, run=None):
         G = nx.Graph()
         #1,7,1,7,16
         for value in self.genome.split(" "):
@@ -78,18 +78,20 @@ class Graph:
         ax = plt.gca()
         ax.margins(0.08)
         plt.axis("off")
-        plt.title("score: " + str(self.score))
+        plt.title("score: " + str(self.score) )
+        #print(self.genome)
         plt.tight_layout()
-        today = date.today().strftime("%Y-%m-%d")
-        Path(f"./logs/{today}").mkdir(parents=False, exist_ok=True)
-        biggest = 0
-        for dir in glob.glob(f'./logs/{today}/*'):
-            if os.path.isdir(dir):
-                value = int(dir.split("Run_")[1])
-                if value>biggest:
-                    biggest = value
+        if today==None:
+            today = date.today().strftime("%Y-%m-%d")
+            Path(f"./logs/{today}").mkdir(parents=False, exist_ok=True)
+            biggest = 0
+            for dir in glob.glob(f'./logs/{today}/*'):
+                if os.path.isdir(dir):
+                    value = int(dir.split("Run_")[1])
+                    if value>biggest:
+                        biggest = value
 
-        run = f"/Run_{biggest}"
+            run = f"/Run_{biggest}"
         Path(f"./logs/{today}/{run}").mkdir(parents=False, exist_ok=True)
         plt.savefig(f"./logs/{today}/{run}/Generation_{self.generation}.png", dpi=600)
         plt.close()

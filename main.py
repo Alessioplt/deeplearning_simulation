@@ -19,9 +19,21 @@ WINDOW_WIDTH = 1000
 generation = 1
 numberConnection = 20
 
-#TODO being able to continue a simultation
-def main(listePopulation, allSafe, generation, statsNuage):
+#TODO being able to continue a simultation, Update: empecher la creation de nouveau fichier et edité les bon fichiers
+def main(listePopulation, allSafe, generation, statsNuage, continuePreviousSim):
     pygame.init()
+    if continuePreviousSim:
+        previousSimFile = open("./logs/savedSim.meow", "r")
+        lines = previousSimFile.readlines()
+        generation = int(lines[4][:-1].split(", ")[-1]) +1
+        today = lines[2][:-1]
+        run = lines[3][:-1]
+        x = list(map(int, lines[4][:-1].split(", ")))
+        y = list(map(int, lines[5][:-1].split(", ")))
+        statsNuage.restoreOldSim(x, y)
+        print(today)
+        listePopulation = createNewGen([Individu(numberConnection, [0, 0], lines[1][:-1], mutateChance=0)], tailleSimulation, numberConnection, WINDOW_HEIGHT, generation) #TODO get the value from file
+
     SCREEN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     updateScreen(SCREEN, allSafe, listePopulation)
     while True:
@@ -38,10 +50,24 @@ def main(listePopulation, allSafe, generation, statsNuage):
         survivants = len(listePopulation)
         print(f"Survived at gen {generation} = {survivants}")
         # regenerateNewPopulation (ceux qui restent ce reproduisent)
-        listePopulation = createNewGen(listePopulation, tailleSimulation, numberConnection, WINDOW_HEIGHT, generation)
+        listePopulation.sort(key=lambda x: x.score, reverse=True)
+        bestOfGen = listePopulation[0]
+        listePopulation = createNewGen(listePopulation, tailleSimulation, numberConnection, WINDOW_HEIGHT, generation, today, run)
         updateScreen(SCREEN, allSafe, listePopulation)
         generation += 1
-        statsNuage.addValue(generation-1, survivants)
+        saveData = statsNuage.addValue(generation-1, survivants, today, run)
+        print(saveData)
+        with open('./logs/savedSim.meow', 'r') as file:
+            data = file.readlines()
+            print(data)
+            data[1] = bestOfGen.genome + "\n"
+            if generation == 2:
+                data[2] = saveData[2] + "\n"
+                data[3] = saveData[3] + "\n"
+            data[4] = str(saveData[0])[1:][:-1] + "\n"
+            data[5] = str(saveData[1])[1:][:-1]
+        with open('./logs/savedSim.meow', 'w') as file:
+            file.writelines(data)
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
                 pygame.quit()
@@ -85,12 +111,11 @@ def createIndividus(number, numberGenome, taillegrille, coordonneesInterdites = 
         individusListe.append(Individu(numberGenome, [coord, taillegrille]))
     return individusListe
 
-def createNewGen(listePopulation, number, numberGenome, taillegrille, generation):
+def createNewGen(listePopulation, number, numberGenome, taillegrille, generation, today=None, run=None):
     listeCoord = []
     individusListe = []
     increment = 0
-    listePopulation.sort(key=lambda x: x.score, reverse=True)
-    Graph(listePopulation[0].genome, generation, listePopulation[0].score).drawGraph()
+    Graph(listePopulation[0].genome, generation, listePopulation[0].score).drawGraph(today, run)
     numberReproductionLeft = listePopulation[increment].score // 10
     for value in listePopulation:
         listeCoord.append(value.params[0])
@@ -179,6 +204,8 @@ def cleanBoard(SCREEN, listePopulation, allSafe):
 def newGrid(grid, allSafe):
     allSafe.append((grid[0], grid[1], grid[0]+(grid[2]*10), grid[1]+(grid[3]*10)))
     return allSafe
+
+
 tailleSimulation = 1000
 individuListe = createIndividus(tailleSimulation, numberConnection, WINDOW_HEIGHT)
 
@@ -188,6 +215,6 @@ statsNuage = TimeSeriegenerator(tailleSimulation)
 allSafe = []
 newGrid((0, 0, 7, 100), allSafe)
 newGrid((930, 0, 7, 100), allSafe)
-main(individuListe, allSafe, generation, statsNuage)
+main(individuListe, allSafe, generation, statsNuage, continuePreviousSim=True)
 
 #check les nouvelles position pour evité les collisions
