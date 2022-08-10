@@ -19,8 +19,7 @@ WINDOW_WIDTH = 1000
 generation = 1
 numberConnection = 20
 
-#TODO being able to continue a simultation, Update: empecher la creation de nouveau fichier et edité les bon fichiers
-def main(listePopulation, allSafe, generation, statsNuage, continuePreviousSim):
+def main(listePopulation, allSafe, generation, statsNuage, continuePreviousSim, centerMode=False):
     pygame.init()
     if continuePreviousSim:
         previousSimFile = open("./logs/savedSim.meow", "r")
@@ -31,9 +30,10 @@ def main(listePopulation, allSafe, generation, statsNuage, continuePreviousSim):
         x = list(map(int, lines[4][:-1].split(", ")))
         y = list(map(int, lines[5][:-1].split(", ")))
         statsNuage.restoreOldSim(x, y)
-        print(today)
-        listePopulation = createNewGen([Individu(numberConnection, [0, 0], lines[1][:-1], mutateChance=0)], tailleSimulation, numberConnection, WINDOW_HEIGHT, generation) #TODO get the value from file
-
+        listePopulation = createNewGen([Individu(numberConnection, [0, 0], lines[1][:-1], mutateChance=0)], tailleSimulation, numberConnection, WINDOW_HEIGHT, generation)
+    else:
+        today = None
+        run = None
     SCREEN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     updateScreen(SCREEN, allSafe, listePopulation)
     while True:
@@ -45,7 +45,7 @@ def main(listePopulation, allSafe, generation, statsNuage, continuePreviousSim):
         #150 action
         startSimutation(SCREEN, listePopulation, 150, allSafe)
 
-        cleanBoard(SCREEN, listePopulation, allSafe)
+        cleanBoard(SCREEN, listePopulation, allSafe, centerMode)
         #time.sleep(5)
         survivants = len(listePopulation)
         print(f"Survived at gen {generation} = {survivants}")
@@ -56,10 +56,8 @@ def main(listePopulation, allSafe, generation, statsNuage, continuePreviousSim):
         updateScreen(SCREEN, allSafe, listePopulation)
         generation += 1
         saveData = statsNuage.addValue(generation-1, survivants, today, run)
-        print(saveData)
         with open('./logs/savedSim.meow', 'r') as file:
             data = file.readlines()
-            print(data)
             data[1] = bestOfGen.genome + "\n"
             if generation == 2:
                 data[2] = saveData[2] + "\n"
@@ -177,7 +175,7 @@ def startSimutation(SCREEN, listePopulation, numberOfActionPerGen, allSafe):
                 SCREEN.fill(RED, (value.params[0][0] + 1, value.params[0][1] + 1, 8, 8))
         pygame.display.flip()
 
-def cleanBoard(SCREEN, listePopulation, allSafe):
+def cleanBoard(SCREEN, listePopulation, allSafe, centerMode):
     toRemove = []
     for value in listePopulation:
         isSafe = False
@@ -186,13 +184,16 @@ def cleanBoard(SCREEN, listePopulation, allSafe):
                 pass
             else:
                 isSafe = True
-                middleX = ((coordSafe[2] - coordSafe[0]) / 2) + coordSafe[0]
-                middleY = ((coordSafe[3] - coordSafe[1]) / 2) + coordSafe[1]
-                middleSafe = [middleX, middleY]
-                distanceMiddleBorder = math.dist(middleSafe, [coordSafe[0], coordSafe[1]])
-                dist = math.dist(middleSafe, value.params[0])
-                if int(100 - (dist*100/distanceMiddleBorder)) > value.score:
-                    value.score = int(100 - (dist*100/distanceMiddleBorder))
+                if centerMode:
+                    middleX = ((coordSafe[2] - coordSafe[0]) / 2) + coordSafe[0]
+                    middleY = ((coordSafe[3] - coordSafe[1]) / 2) + coordSafe[1]
+                    middleSafe = [middleX, middleY]
+                    distanceMiddleBorder = math.dist(middleSafe, [coordSafe[0], coordSafe[1]])
+                    dist = math.dist(middleSafe, value.params[0])
+                    if int(100 - (dist*100/distanceMiddleBorder)) > value.score:
+                        value.score = int(100 - (dist*100/distanceMiddleBorder))
+                else:
+                    value.score = 100
         if not isSafe:
             SCREEN.fill(WHITE, (value.params[0][0] + 1, value.params[0][1] + 1, 8, 8))
             toRemove.append(value)
@@ -215,6 +216,6 @@ statsNuage = TimeSeriegenerator(tailleSimulation)
 allSafe = []
 newGrid((0, 0, 7, 100), allSafe)
 newGrid((930, 0, 7, 100), allSafe)
-main(individuListe, allSafe, generation, statsNuage, continuePreviousSim=True)
+main(individuListe, allSafe, generation, statsNuage, continuePreviousSim=False)
 
 #check les nouvelles position pour evité les collisions
