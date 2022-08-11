@@ -27,6 +27,7 @@ def main(listePopulation, allSafe, generation, statsNuage, continuePreviousSim, 
         generation = int(lines[4][:-1].split(", ")[-1]) +1
         today = lines[2][:-1]
         run = lines[3][:-1]
+        print(lines[5][:-1].split(", "))
         x = list(map(int, lines[4][:-1].split(", ")))
         y = list(map(int, lines[5][:-1].split(", ")))
         statsNuage.restoreOldSim(x, y)
@@ -207,7 +208,7 @@ def newGrid(grid, allSafe):
     return allSafe
 
 
-tailleSimulation = 1000
+tailleSimulation = 10
 individuListe = createIndividus(tailleSimulation, numberConnection, WINDOW_HEIGHT)
 
 
@@ -216,6 +217,6 @@ statsNuage = TimeSeriegenerator(tailleSimulation)
 allSafe = []
 newGrid((0, 0, 7, 100), allSafe)
 newGrid((930, 0, 7, 100), allSafe)
-main(individuListe, allSafe, generation, statsNuage, continuePreviousSim=False)
+main(individuListe, allSafe, generation, statsNuage, continuePreviousSim=True)
 
 #check les nouvelles position pour evité les collisions

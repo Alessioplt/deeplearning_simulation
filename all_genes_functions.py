@@ -1,6 +1,3 @@
-import json
-#50/100 - 0.5 =
-#est border distance
 import random
 
 
@@ -139,39 +136,3 @@ def MNE(params):
     newCoord = (params[0][0] + 10, params[0][1] - 10)
     if newCoord[0] < params[1] - 1 and newCoord[1] < params[1] - 1 and newCoord not in params[2]:
         return newCoord
-
-
-#"0000111": [INTERNAL, "N"],
-all_Gene={"0000000": [EDB, "S"],
-            "0000001": [SBD, "S"],
-            "0000010": [DS, "S"],
-            "0000011": [DN, "S"],
-            "0000100": [DW, "S"],
-            "0000101": [DE, "S"],
-            "0000110": [RNI, "S"],
-
-            "0001000": [MS, "A"],
-            "0001001": [MN, "A"],
-            "0001010": [MW, "A"],
-            "0001011": [ME, "A"],
-            "0001100": [MR, "A"],
-            "0001101": [MSW, "A"],
-            "0001110": [MSE, "A"],
-            "0001111": [MNW, "A"],
-            "0010000": [MNE, "A"],
-            "0010001": [DSW, "S"],
-            "0010010": [DSE, "S"],
-            "0010011": [DNW, "S"],
-            "0010100": [DNE, "S"]
-}
-def getTypeGene(type):
-    tab= []
-    for key in all_Gene.keys():
-        if all_Gene[key][1]==type:
-            tab.append(key)
-    return tab
-def callFunction(name, params=None):
-    if params is None:
-        params = []
-    return all_Gene[name][0](params)
-

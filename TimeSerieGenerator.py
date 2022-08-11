@@ -27,7 +27,6 @@ class TimeSeriegenerator:
         plt.title("Stats Simulation:" + str(self.taille) + " individus total")
         plt.xlabel("Generation N°")
         plt.ylabel("Nombres de survivants")
-        print(today)
         if today == None:
             today = date.today().strftime("%Y-%m-%d")
             Path(f"./logs/{today}").mkdir(parents=False, exist_ok=True)

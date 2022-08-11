@@ -5,14 +5,15 @@ import matplotlib.pyplot as plt
 import networkx as nx
 from pathlib import Path
 from datetime import date
-
+import gene_manager
 import json
 class Graph:
     def __init__(self, genome, generation, score):
         self.score = score
         self.genome = genome
         self.generation = generation
-        self.genesList =json.load(open('genes.json'))
+        self.sensorGenesList =gene_manager.all_sensor
+        self.actionGenesList =gene_manager.all_action
         self.pos = {}
         self.listeSensor = []
         self.listeNeutral = []
@@ -38,26 +39,24 @@ class Graph:
             else:
                 self.listeNeutral.append(sinkId) if sinkId not in self.listeNeutral else self.listeNeutral
             weight = int(weight, 2)/8191.75
-
             if weightNegative=="1":
                 weight=-weight
             if inputType == "1":
                 if sinkType == "1":
                     G.add_edge(inputId, sinkId, weight=weight)
                 else:
-                    G.add_edge(inputId, self.genesList[sinkId], weight=weight)
+                    G.add_edge(inputId, self.actionGenesList[str(int(sinkId, 2))].__name__, weight=weight)
             elif sinkType == "1":
-                G.add_edge(self.genesList[inputId], sinkId, weight=weight)
+                G.add_edge(self.sensorGenesList[str(int(inputId, 2))].__name__, sinkId, weight=weight)
             else:
-                G.add_edge(self.genesList[inputId], self.genesList[sinkId], weight=weight)
+                G.add_edge(self.sensorGenesList[str(int(inputId, 2))].__name__, self.actionGenesList[str(int(sinkId, 2))].__name__, weight=weight)
         middle = (max([len(self.listeSensor), len(self.listeNeutral), len(self.listeAction)])-1)/2
         for i in range (len(self.listeSensor)):
-            self.pos[self.genesList[self.listeSensor[i]]] = (i,1)
+            self.pos[self.sensorGenesList[str(int(self.listeSensor[i], 2))].__name__] = (i,1)
         for i in range (len(self.listeNeutral)):
             self.pos[self.listeNeutral[i]] = (i,0)
         for i in range (len(self.listeAction)):
-            self.pos[self.genesList[self.listeAction[i]]] = (i,-1)
-
+            self.pos[self.actionGenesList[str(int(self.listeAction[i], 2))].__name__] = (i,-1)
 
         nx.draw_networkx_nodes(G, self.pos, node_size=1000)
         for value in G.edges(data=True):
@@ -90,7 +89,8 @@ class Graph:
                     value = int(dir.split("Run_")[1])
                     if value>biggest:
                         biggest = value
-
+            if self.generation == 1:
+                biggest += 1
             run = f"/Run_{biggest}"
         Path(f"./logs/{today}/{run}").mkdir(parents=False, exist_ok=True)
         plt.savefig(f"./logs/{today}/{run}/Generation_{self.generation}.png", dpi=600)
