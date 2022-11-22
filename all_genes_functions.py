@@ -136,3 +136,6 @@ def MNE(params):
     newCoord = (params[0][0] + 10, params[0][1] - 10)
     if newCoord[0] < params[1] - 1 and newCoord[1] < params[1] - 1 and newCoord not in params[2]:
         return newCoord
+
+def DNO(params):
+    return params[0]

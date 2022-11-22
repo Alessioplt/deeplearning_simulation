@@ -25,7 +25,8 @@ all_action = {
             "6": all_genes_functions.MSW,
             "7": all_genes_functions.MSE,
             "8": all_genes_functions.MNW,
-            "9": all_genes_functions.MNE
+            "9": all_genes_functions.MNE,
+            "21": all_genes_functions.DNO
 }
 
 

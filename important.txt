@@ -31,6 +31,6 @@ MSW = Move south west		0001101
 MSE = Move south est		0001110
 MNW = Move north west		0001111
 MNE = Move north est		0010000
-
+DNO  = Do nothing           0010101
 
 removed            "0000111": "INTERNAL",

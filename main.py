@@ -123,21 +123,29 @@ def createNewGen(listePopulation, number, numberGenome, taillegrille, generation
         while coord in listeCoord:
             coord = (random.randint(0, taillegrille / 10) * 10, random.randint(0, taillegrille / 10) * 10)
         listeCoord.append(coord)
-        if generation > 100:
+        if generation > 200:
             individusListe.append(
                 Individu(numberGenome, [coord, taillegrille], value.genome, mutateChance=0))
-        else:
+        elif generation > 100:
             individusListe.append(
                 Individu(numberGenome, [coord, taillegrille], value.genome, mutateChance=2))
+        else:
+            individusListe.append(
+                Individu(numberGenome, [coord, taillegrille], value.genome, mutateChance=3))
     while len(individusListe) < number:
         coord = (random.randint(0, taillegrille / 10) * 10, random.randint(0, taillegrille / 10) * 10)
         while coord in listeCoord:
             coord = (random.randint(0, taillegrille / 10) * 10, random.randint(0, taillegrille / 10) * 10)
         listeCoord.append(coord)
-        if generation > 100:
-            individusListe.append(Individu(numberGenome, [coord, taillegrille], listePopulation[increment].genome, mutateChance=0))
+        if generation > 200:
+            individusListe.append(
+                Individu(numberGenome, [coord, taillegrille], value.genome, mutateChance=0))
+        elif generation > 100:
+            individusListe.append(
+                Individu(numberGenome, [coord, taillegrille], value.genome, mutateChance=2))
         else:
-            individusListe.append(Individu(numberGenome, [coord, taillegrille], listePopulation[increment].genome, mutateChance=2))
+            individusListe.append(
+                Individu(numberGenome, [coord, taillegrille], value.genome, mutateChance=3))
         numberReproductionLeft -=1
         if numberReproductionLeft==0:
             if increment == len(listePopulation) - 1:
@@ -208,15 +216,15 @@ def newGrid(grid, allSafe):
     return allSafe
 
 
-tailleSimulation = 10
+tailleSimulation = 1000
 individuListe = createIndividus(tailleSimulation, numberConnection, WINDOW_HEIGHT)
 
 
 statsNuage = TimeSeriegenerator(tailleSimulation)
 #taille de la grille en carré
 allSafe = []
-newGrid((0, 0, 7, 100), allSafe)
-newGrid((930, 0, 7, 100), allSafe)
-main(individuListe, allSafe, generation, statsNuage, continuePreviousSim=True)
+newGrid((80, 80, 80, 10), allSafe)
+newGrid((810, 80, 10, 80), allSafe)
+main(individuListe, allSafe, generation, statsNuage, continuePreviousSim=False, centerMode=False)
 
 #check les nouvelles position pour evité les collisions
