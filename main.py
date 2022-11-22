@@ -131,7 +131,7 @@ def createNewGen(listePopulation, number, numberGenome, taillegrille, generation
                 Individu(numberGenome, [coord, taillegrille], value.genome, mutateChance=2))
         else:
             individusListe.append(
-                Individu(numberGenome, [coord, taillegrille], value.genome, mutateChance=3))
+                Individu(numberGenome, [coord, taillegrille], value.genome, mutateChance=4))
     while len(individusListe) < number:
         coord = (random.randint(0, taillegrille / 10) * 10, random.randint(0, taillegrille / 10) * 10)
         while coord in listeCoord:
@@ -145,7 +145,7 @@ def createNewGen(listePopulation, number, numberGenome, taillegrille, generation
                 Individu(numberGenome, [coord, taillegrille], value.genome, mutateChance=2))
         else:
             individusListe.append(
-                Individu(numberGenome, [coord, taillegrille], value.genome, mutateChance=3))
+                Individu(numberGenome, [coord, taillegrille], value.genome, mutateChance=4))
         numberReproductionLeft -=1
         if numberReproductionLeft==0:
             if increment == len(listePopulation) - 1:
