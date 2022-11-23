@@ -1,6 +1,8 @@
 # deeplearning
 Simulation of simple behavior with simple deeplearning algorithm
-algorithm used Multilayer Perceptron’s
+
+algorithm used: 
+Multilayer Perceptron’s
 
 simulation :
 each dot (red ans green) represent one individual
